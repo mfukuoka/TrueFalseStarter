@@ -21,20 +21,15 @@ class ViewController: UIViewController {
     
     let game = Game()
     var currentQuestion: Question?
-
+    var gameTimer: DispatchWorkItem?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        game.loadGameStartSound()
         // Start game
         game.playGameStartSound()
-        
         playAgainButton.isHidden = true
         currentQuestion = game.pickRandomQuestion()
-        displayQuestion(question: currentQuestion!)
-       
-        
-        
+        displayQuestion(question: currentQuestion!) 
     }
 
     override func didReceiveMemoryWarning() {
@@ -42,6 +37,7 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    //resets all the answer buttons to their default state
     func setButtonsToDefault(){
         let defaultColor = UIColor.init(red: 12/255.0, green: 121/255.0, blue: 150/255.0, alpha: 1)
         option1Button.backgroundColor = defaultColor
@@ -52,7 +48,13 @@ class ViewController: UIViewController {
         option2Button.setTitleColor(UIColor.white, for: .normal)
         option3Button.setTitleColor(UIColor.white, for: .normal)
         option4Button.setTitleColor(UIColor.white, for: .normal)
+        self.option1Button.isHidden = false
+        self.option2Button.isHidden = false
+        self.option3Button.isHidden = false
+        self.option4Button.isHidden = false
     }
+    
+    //update the question label and the answer buttons
     func displayQuestion(question: Question) {
         currentQuestion = question
         questionField.text = question.question
@@ -60,13 +62,11 @@ class ViewController: UIViewController {
         option2Button.setTitle(question.option2, for: .normal)
         option3Button.setTitle(question.option3, for: .normal)
         option4Button.setTitle(question.option4, for: .normal)
-        
         self.setButtonsToDefault()
-        
-        
-    
+        gameTimer = self.lightingMode()
     }
     
+    //Show the final score, hide the answer buttons, show the play again button
     func displayScore() {
         // Hide the answer buttons
         option1Button.isHidden = true
@@ -76,12 +76,15 @@ class ViewController: UIViewController {
 
         // Display play again button
         playAgainButton.isHidden = false
-        
+        game.playGameEndSound()
         questionField.text = "Way to go!\nYou got \(game.correctAnswers) out of \(game.totalQuestions) correct!"
         
     }
     
+    //answer button touch up inside event
     @IBAction func checkAnswer(_ sender: UIButton) {
+        
+        //check if the selected answer is correct
         let correctAnswer = currentQuestion?.correctAnswer
         if ((sender === option1Button &&  correctAnswer == 1) ||
             (sender === option2Button && correctAnswer == 2) ||
@@ -89,13 +92,16 @@ class ViewController: UIViewController {
             (sender === option4Button && correctAnswer == 4)) {
             game.correctAnswers += 1
             questionField.text = "Correct!"
+            game.playCorrectAnswerSound()
         } else {
             
             questionField.text = "Sorry, wrong answer!"
+            game.playWrongAnswerSound()
         }
+        
+        //style the answer buttons to show the correct answer
         if let answer = correctAnswer {
             let correctAnswerColor = UIColor.init(red: 51/255.0, green: 204/255.0, blue: 102/255.0, alpha: 1)
-            let defaultColor = UIColor.init(red: 12/255.0, green: 121/255.0, blue: 150/255.0, alpha: 1)
             switch answer {
             case 1:
                 option1Button.setTitleColor(UIColor.black, for: .normal)
@@ -110,22 +116,19 @@ class ViewController: UIViewController {
                 option4Button.setTitleColor(UIColor.black, for: .normal)
                 option4Button.backgroundColor = correctAnswerColor
             default:
-                option1Button.setTitleColor(UIColor.white, for: .normal)
-                option2Button.setTitleColor(UIColor.white, for: .normal)
-                option3Button.setTitleColor(UIColor.white, for: .normal)
-                option4Button.setTitleColor(UIColor.white, for: .normal)
-                option1Button.backgroundColor = defaultColor
-                option2Button.backgroundColor = defaultColor
-                option3Button.backgroundColor = defaultColor
-                option4Button.backgroundColor = defaultColor
+                self.setButtonsToDefault()
             }
+        }
+        //cancel lighting mode
+        if let timer = gameTimer  {
+            timer.cancel()
         }
         loadNextRoundWithDelay(seconds: 2)
     }
     
     func nextRound() {
         if let nextQuestion = self.game.pickRandomQuestion() {
-            self.displayQuestion(question: nextQuestion)   
+            self.displayQuestion(question: nextQuestion)
         }
         else{
             displayScore()
@@ -139,19 +142,14 @@ class ViewController: UIViewController {
         option3Button.isHidden = false
         option4Button.isHidden = false
         playAgainButton.isHidden = true
-        
-        //questionsAsked = 0
-        //correctQuestions = 0
-        //nextRound()
+
+        //restart game
         game.restartGame()
         currentQuestion = game.pickRandomQuestion()
         displayQuestion(question: currentQuestion!)
     }
     
-
-    
     // MARK: Helper Methods
-    
     func loadNextRoundWithDelay(seconds: Int) {
         // Converts a delay in seconds to nanoseconds as signed 64 bit integer
         let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
@@ -160,10 +158,29 @@ class ViewController: UIViewController {
         
         // Executes the nextRound method at the dispatch time on the main queue
         DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
-           self.nextRound()
-
-            
+        self.nextRound()
         }
+    }
+    func lightingMode() -> DispatchWorkItem {
+        let timer = 15
+        // Converts a delay in seconds to nanoseconds as signed 64 bit integer
+        let delay = Int64(NSEC_PER_SEC * UInt64(timer))
+        // Calculates a time value to execute the method given current time and delay
+        let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
+        let lighting = DispatchWorkItem(block: {
+            self.questionField.text = "Outta time!"
+            self.game.playWrongAnswerSound()
+            self.option1Button.isHidden = true
+            self.option2Button.isHidden = true
+            self.option3Button.isHidden = true
+            self.option4Button.isHidden = true
+            
+            self.loadNextRoundWithDelay(seconds: 2)
+        })
+        // Executes the nextRound method at the dispatch time on the main queue
+        DispatchQueue.main.asyncAfter(deadline: dispatchTime, execute: lighting)
+        //lighting.cancel()
+        return lighting
     }
     
 

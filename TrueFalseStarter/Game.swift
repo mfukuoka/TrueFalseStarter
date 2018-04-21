@@ -16,9 +16,11 @@ class Game {
     var correctAnswers = 0
     var totalQuestions = 0
     init(){
+        
         totalQuestions = quiz.questions.count
     }
     func restartGame(){
+        self.playGameStartSound()
         quiz = Quiz()
         correctAnswers = 0
         totalQuestions = quiz.questions.count
@@ -39,7 +41,17 @@ class Game {
     }
     
     func playGameStartSound() {
+        self.loadGameStartSound()
         AudioServicesPlaySystemSound(gameSound)
+    }
+    func playCorrectAnswerSound(){
+        AudioServicesPlaySystemSound(1016)
+    }
+    func playWrongAnswerSound(){
+        AudioServicesPlaySystemSound(1006)
+    }
+    func playGameEndSound(){
+    AudioServicesPlaySystemSound(1027)
     }
 }
 
