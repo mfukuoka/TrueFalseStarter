@@ -33,7 +33,22 @@ class Game {
             return nil
         }
     }
-    
+    //function to get the current questions correct answer
+    func isAnswerCorrect(question: Question?, answer: Int) -> (isCorrect: Bool,answer: Int){
+        if let correctAnswer = question?.correctAnswer {
+            if correctAnswer == answer {
+                self.correctAnswers += 1
+                self.playCorrectAnswerSound()
+                return (isCorrect: true, answer: correctAnswer)
+            }
+            else{
+                return (isCorrect: false, answer: correctAnswer)
+            }
+        }
+        else {
+            return (isCorrect: false, answer: 0)
+        }
+    }
     func loadGameStartSound() {
         let pathToSoundFile = Bundle.main.path(forResource: "GameSound", ofType: "wav")
         let soundURL = URL(fileURLWithPath: pathToSoundFile!)

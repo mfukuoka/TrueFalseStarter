@@ -13,6 +13,7 @@ import AudioToolbox
 class ViewController: UIViewController {
 
     @IBOutlet weak var questionField: UILabel!
+    @IBOutlet weak var answerLabel: UILabel!
     @IBOutlet weak var option1Button: UIButton!
     @IBOutlet weak var option2Button: UIButton!
     @IBOutlet weak var option3Button: UIButton!
@@ -28,6 +29,7 @@ class ViewController: UIViewController {
         // Start game
         game.playGameStartSound()
         playAgainButton.isHidden = true
+        answerLabel.isHidden = true
         currentQuestion = game.pickRandomQuestion()
         displayQuestion(question: currentQuestion!) 
     }
@@ -38,7 +40,7 @@ class ViewController: UIViewController {
     }
     
     //resets all the answer buttons to their default state
-    func setButtonsToDefault(){
+    func setScreenToDefault(){
         let defaultColor = UIColor.init(red: 12/255.0, green: 121/255.0, blue: 150/255.0, alpha: 1)
         option1Button.backgroundColor = defaultColor
         option2Button.backgroundColor = defaultColor
@@ -52,17 +54,80 @@ class ViewController: UIViewController {
         self.option2Button.isHidden = false
         self.option3Button.isHidden = false
         self.option4Button.isHidden = false
+        self.answerLabel.isHidden = true
+        self.questionField.isHidden = false
+    }
+    func setScreenOutOfTime(){
+        self.answerLabel.isHidden = false
+        self.answerLabel.textColor = UIColor.init(red: 204/255.0, green: 0, blue: 0, alpha: 0.8)
+        self.answerLabel.text = "You ran out of time!"
+        self.questionField.isHidden = true
+        self.option1Button.isHidden = true
+        self.option2Button.isHidden = true
+        self.option3Button.isHidden = true
+        self.option4Button.isHidden = true
+    }
+    
+    func setScreenFor(answer: Int){
+        
+        //highlight answer button of correct answer
+        let correctAnswerColor = UIColor.init(red: 51/255.0, green: 204/255.0, blue: 102/255.0, alpha: 1)
+        let otherAnswerColor = UIColor.init(red: 0/255.0, green: 231/255.0, blue: 254/255.0, alpha: 0.2)
+        let otherAnswerTextColor = UIColor.init(red: 204/255.0, green: 204/255.0, blue: 204/255.0, alpha: 0.25)
+        switch answer {
+        case 1:
+            option1Button.setTitleColor(UIColor.black, for: .normal)
+            option1Button.backgroundColor = correctAnswerColor
+            option2Button.backgroundColor = otherAnswerColor
+            option2Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            option3Button.backgroundColor = otherAnswerColor
+            option3Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            option4Button.backgroundColor = otherAnswerColor
+            option4Button.setTitleColor(otherAnswerTextColor, for: .normal)
+        case 2:
+            option2Button.setTitleColor(UIColor.black, for: .normal)
+            option1Button.backgroundColor = otherAnswerColor
+            option1Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            option2Button.backgroundColor = correctAnswerColor
+            option3Button.backgroundColor = otherAnswerColor
+            option3Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            option4Button.backgroundColor = otherAnswerColor
+            option4Button.setTitleColor(otherAnswerTextColor, for: .normal)
+        case 3:
+            option3Button.setTitleColor(UIColor.black, for: .normal)
+            option1Button.backgroundColor = otherAnswerColor
+            option1Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            option2Button.backgroundColor = otherAnswerColor
+            option2Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            option3Button.backgroundColor = correctAnswerColor
+            option4Button.backgroundColor = otherAnswerColor
+            option4Button.setTitleColor(otherAnswerTextColor, for: .normal)
+
+        case 4:
+            option4Button.setTitleColor(UIColor.black, for: .normal)
+            option1Button.backgroundColor = otherAnswerColor
+            option1Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            option2Button.backgroundColor = otherAnswerColor
+            option2Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            option3Button.backgroundColor = otherAnswerColor
+            option3Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            option4Button.backgroundColor = correctAnswerColor
+        default:
+            self.setScreenToDefault()
+        }
     }
     
     //update the question label and the answer buttons
     func displayQuestion(question: Question) {
+        
+        //update screen
+        //self.setScreenToDefault()
         currentQuestion = question
         questionField.text = question.question
         option1Button.setTitle(question.option1, for: .normal)
         option2Button.setTitle(question.option2, for: .normal)
         option3Button.setTitle(question.option3, for: .normal)
         option4Button.setTitle(question.option4, for: .normal)
-        self.setButtonsToDefault()
         gameTimer = self.lightingMode()
     }
     
@@ -73,7 +138,8 @@ class ViewController: UIViewController {
         option2Button.isHidden = true
         option3Button.isHidden = true
         option4Button.isHidden = true
-
+        answerLabel.isHidden = true
+        
         // Display play again button
         playAgainButton.isHidden = false
         game.playGameEndSound()
@@ -81,48 +147,51 @@ class ViewController: UIViewController {
         
     }
     
+
+    
     //answer button touch up inside event
     @IBAction func checkAnswer(_ sender: UIButton) {
         
-        //check if the selected answer is correct
-        let correctAnswer = currentQuestion?.correctAnswer
-        if ((sender === option1Button &&  correctAnswer == 1) ||
-            (sender === option2Button && correctAnswer == 2) ||
-            (sender === option3Button && correctAnswer == 3) ||
-            (sender === option4Button && correctAnswer == 4)) {
-            game.correctAnswers += 1
-            questionField.text = "Correct!"
-            game.playCorrectAnswerSound()
-        } else {
+        //show results
+        answerLabel.isHidden = false
+        
+        //get the selected answer
+        var selectedAnswer = 0
+        switch sender {
+        case option1Button:
+            selectedAnswer = 1
+        case option2Button:
+            selectedAnswer = 2
+        case option3Button:
+            selectedAnswer = 3
+        case option4Button:
+            selectedAnswer = 4
+        default: selectedAnswer = 0
             
-            questionField.text = "Sorry, wrong answer!"
-            game.playWrongAnswerSound()
         }
         
-        //style the answer buttons to show the correct answer
-        if let answer = correctAnswer {
-            let correctAnswerColor = UIColor.init(red: 51/255.0, green: 204/255.0, blue: 102/255.0, alpha: 1)
-            switch answer {
-            case 1:
-                option1Button.setTitleColor(UIColor.black, for: .normal)
-                option1Button.backgroundColor = correctAnswerColor
-            case 2:
-                option2Button.setTitleColor(UIColor.black, for: .normal)
-                option2Button.backgroundColor = correctAnswerColor
-            case 3:
-                option3Button.setTitleColor(UIColor.black, for: .normal)
-                option3Button.backgroundColor = correctAnswerColor
-            case 4:
-                option4Button.setTitleColor(UIColor.black, for: .normal)
-                option4Button.backgroundColor = correctAnswerColor
-            default:
-                self.setButtonsToDefault()
-            }
+        //is answer correct?
+        let correctAnswer = game.isAnswerCorrect(question: currentQuestion, answer: selectedAnswer)
+        if correctAnswer.isCorrect {
+            answerLabel.text = "Correct!"
+            answerLabel.textColor = UIColor.init(red: 0, green: 204/255.0, blue: 0, alpha: 1)
+
         }
-        //cancel lighting mode
+        else{
+            answerLabel.text = "Wrong!"
+            answerLabel.textColor = UIColor.init(red: 204/255.0, green: 0, blue: 0, alpha: 0.8)
+            game.playWrongAnswerSound()
+        }
+
+        //update screen for answer results
+        setScreenFor(answer: correctAnswer.answer)
+        
+        //cancel lighting mode since something was picked
         if let timer = gameTimer  {
             timer.cancel()
         }
+        
+        //load next question
         loadNextRoundWithDelay(seconds: 2)
     }
     
@@ -158,6 +227,7 @@ class ViewController: UIViewController {
         
         // Executes the nextRound method at the dispatch time on the main queue
         DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
+        self.setScreenToDefault()
         self.nextRound()
         }
     }
@@ -168,18 +238,14 @@ class ViewController: UIViewController {
         // Calculates a time value to execute the method given current time and delay
         let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
         let lighting = DispatchWorkItem(block: {
-            self.questionField.text = "Outta time!"
+            //set the screen for ran out of time message, play wrong answer sound
+            self.setScreenOutOfTime()
             self.game.playWrongAnswerSound()
-            self.option1Button.isHidden = true
-            self.option2Button.isHidden = true
-            self.option3Button.isHidden = true
-            self.option4Button.isHidden = true
-            
             self.loadNextRoundWithDelay(seconds: 2)
         })
         // Executes the nextRound method at the dispatch time on the main queue
         DispatchQueue.main.asyncAfter(deadline: dispatchTime, execute: lighting)
-        //lighting.cancel()
+        
         return lighting
     }
     
