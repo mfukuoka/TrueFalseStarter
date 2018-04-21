@@ -10,7 +10,8 @@ import Foundation
 import GameKit
 import AudioToolbox
 
-var gameSound: SystemSoundID = 0
+
+
 class Game {
     var quiz = Quiz()
     var correctAnswers = 0
@@ -19,12 +20,15 @@ class Game {
         
         totalQuestions = quiz.questions.count
     }
+    ///starts the game over
     func restartGame(){
         self.playGameStartSound()
         quiz = Quiz()
         correctAnswers = 0
         totalQuestions = quiz.questions.count
     }
+    
+    ///remove a random question from the quiz
     func pickRandomQuestion() -> Question? {
         if quiz.questions.count > 0 {
         return quiz.questions.remove(at: GKRandomSource.sharedRandom().nextInt(upperBound: quiz.questions.count))
@@ -42,14 +46,20 @@ class Game {
                 return (isCorrect: true, answer: correctAnswer)
             }
             else{
+                 self.playWrongAnswerSound()
                 return (isCorrect: false, answer: correctAnswer)
+                
             }
         }
         else {
             return (isCorrect: false, answer: 0)
         }
     }
+    
+    //sounds for the game
+    var gameSound: SystemSoundID = 0
     func loadGameStartSound() {
+        
         let pathToSoundFile = Bundle.main.path(forResource: "GameSound", ofType: "wav")
         let soundURL = URL(fileURLWithPath: pathToSoundFile!)
         AudioServicesCreateSystemSoundID(soundURL as CFURL, &gameSound)

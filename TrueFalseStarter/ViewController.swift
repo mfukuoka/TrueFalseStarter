@@ -155,7 +155,7 @@ class ViewController: UIViewController {
         //show results
         answerLabel.isHidden = false
         
-        //get the selected answer
+        //get the selected answer from the sender
         var selectedAnswer = 0
         switch sender {
         case option1Button:
@@ -180,7 +180,6 @@ class ViewController: UIViewController {
         else{
             answerLabel.text = "Wrong!"
             answerLabel.textColor = UIColor.init(red: 204/255.0, green: 0, blue: 0, alpha: 0.8)
-            game.playWrongAnswerSound()
         }
 
         //update screen for answer results
