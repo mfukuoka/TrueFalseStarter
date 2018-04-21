@@ -11,33 +11,30 @@ import GameKit
 import AudioToolbox
 
 class ViewController: UIViewController {
-    
-    let questionsPerRound = 4
-    var questionsAsked = 0
-    var correctQuestions = 0
-    var indexOfSelectedQuestion: Int = 0
-    
-    var gameSound: SystemSoundID = 0
-    
-    let trivia: [[String : String]] = [
-        ["Question": "Only female koalas can whistle", "Answer": "False"],
-        ["Question": "Blue whales are technically whales", "Answer": "True"],
-        ["Question": "Camels are cannibalistic", "Answer": "False"],
-        ["Question": "All ducks are birds", "Answer": "True"]
-    ]
-    
+
     @IBOutlet weak var questionField: UILabel!
-    @IBOutlet weak var trueButton: UIButton!
-    @IBOutlet weak var falseButton: UIButton!
+    @IBOutlet weak var option1Button: UIButton!
+    @IBOutlet weak var option2Button: UIButton!
+    @IBOutlet weak var option3Button: UIButton!
+    @IBOutlet weak var option4Button: UIButton!
     @IBOutlet weak var playAgainButton: UIButton!
     
+    let game = Game()
+    var currentQuestion: Question?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadGameStartSound()
+        
+        game.loadGameStartSound()
         // Start game
-        playGameStartSound()
-        displayQuestion()
+        game.playGameStartSound()
+        
+        playAgainButton.isHidden = true
+        currentQuestion = game.pickRandomQuestion()
+        displayQuestion(question: currentQuestion!)
+       
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,60 +42,110 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func displayQuestion() {
-        indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextInt(upperBound: trivia.count)
-        let questionDictionary = trivia[indexOfSelectedQuestion]
-        questionField.text = questionDictionary["Question"]
-        playAgainButton.isHidden = true
+    func setButtonsToDefault(){
+        let defaultColor = UIColor.init(red: 12/255.0, green: 121/255.0, blue: 150/255.0, alpha: 1)
+        option1Button.backgroundColor = defaultColor
+        option2Button.backgroundColor = defaultColor
+        option3Button.backgroundColor = defaultColor
+        option4Button.backgroundColor = defaultColor
+        option1Button.setTitleColor(UIColor.white, for: .normal)
+        option2Button.setTitleColor(UIColor.white, for: .normal)
+        option3Button.setTitleColor(UIColor.white, for: .normal)
+        option4Button.setTitleColor(UIColor.white, for: .normal)
+    }
+    func displayQuestion(question: Question) {
+        currentQuestion = question
+        questionField.text = question.question
+        option1Button.setTitle(question.option1, for: .normal)
+        option2Button.setTitle(question.option2, for: .normal)
+        option3Button.setTitle(question.option3, for: .normal)
+        option4Button.setTitle(question.option4, for: .normal)
+        
+        self.setButtonsToDefault()
+        
+        
+    
     }
     
     func displayScore() {
         // Hide the answer buttons
-        trueButton.isHidden = true
-        falseButton.isHidden = true
-        
+        option1Button.isHidden = true
+        option2Button.isHidden = true
+        option3Button.isHidden = true
+        option4Button.isHidden = true
+
         // Display play again button
         playAgainButton.isHidden = false
         
-        questionField.text = "Way to go!\nYou got \(correctQuestions) out of \(questionsPerRound) correct!"
+        questionField.text = "Way to go!\nYou got \(game.correctAnswers) out of \(game.totalQuestions) correct!"
         
     }
     
     @IBAction func checkAnswer(_ sender: UIButton) {
-        // Increment the questions asked counter
-        questionsAsked += 1
-        
-        let selectedQuestionDict = trivia[indexOfSelectedQuestion]
-        let correctAnswer = selectedQuestionDict["Answer"]
-        
-        if (sender === trueButton &&  correctAnswer == "True") || (sender === falseButton && correctAnswer == "False") {
-            correctQuestions += 1
+        let correctAnswer = currentQuestion?.correctAnswer
+        if ((sender === option1Button &&  correctAnswer == 1) ||
+            (sender === option2Button && correctAnswer == 2) ||
+            (sender === option3Button && correctAnswer == 3) ||
+            (sender === option4Button && correctAnswer == 4)) {
+            game.correctAnswers += 1
             questionField.text = "Correct!"
         } else {
+            
             questionField.text = "Sorry, wrong answer!"
         }
-        
+        if let answer = correctAnswer {
+            let correctAnswerColor = UIColor.init(red: 51/255.0, green: 204/255.0, blue: 102/255.0, alpha: 1)
+            let defaultColor = UIColor.init(red: 12/255.0, green: 121/255.0, blue: 150/255.0, alpha: 1)
+            switch answer {
+            case 1:
+                option1Button.setTitleColor(UIColor.black, for: .normal)
+                option1Button.backgroundColor = correctAnswerColor
+            case 2:
+                option2Button.setTitleColor(UIColor.black, for: .normal)
+                option2Button.backgroundColor = correctAnswerColor
+            case 3:
+                option3Button.setTitleColor(UIColor.black, for: .normal)
+                option3Button.backgroundColor = correctAnswerColor
+            case 4:
+                option4Button.setTitleColor(UIColor.black, for: .normal)
+                option4Button.backgroundColor = correctAnswerColor
+            default:
+                option1Button.setTitleColor(UIColor.white, for: .normal)
+                option2Button.setTitleColor(UIColor.white, for: .normal)
+                option3Button.setTitleColor(UIColor.white, for: .normal)
+                option4Button.setTitleColor(UIColor.white, for: .normal)
+                option1Button.backgroundColor = defaultColor
+                option2Button.backgroundColor = defaultColor
+                option3Button.backgroundColor = defaultColor
+                option4Button.backgroundColor = defaultColor
+            }
+        }
         loadNextRoundWithDelay(seconds: 2)
     }
     
     func nextRound() {
-        if questionsAsked == questionsPerRound {
-            // Game is over
+        if let nextQuestion = self.game.pickRandomQuestion() {
+            self.displayQuestion(question: nextQuestion)   
+        }
+        else{
             displayScore()
-        } else {
-            // Continue game
-            displayQuestion()
         }
     }
     
     @IBAction func playAgain() {
         // Show the answer buttons
-        trueButton.isHidden = false
-        falseButton.isHidden = false
+        option1Button.isHidden = false
+        option2Button.isHidden = false
+        option3Button.isHidden = false
+        option4Button.isHidden = false
+        playAgainButton.isHidden = true
         
-        questionsAsked = 0
-        correctQuestions = 0
-        nextRound()
+        //questionsAsked = 0
+        //correctQuestions = 0
+        //nextRound()
+        game.restartGame()
+        currentQuestion = game.pickRandomQuestion()
+        displayQuestion(question: currentQuestion!)
     }
     
 
@@ -113,18 +160,12 @@ class ViewController: UIViewController {
         
         // Executes the nextRound method at the dispatch time on the main queue
         DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
-            self.nextRound()
+           self.nextRound()
+
+            
         }
     }
     
-    func loadGameStartSound() {
-        let pathToSoundFile = Bundle.main.path(forResource: "GameSound", ofType: "wav")
-        let soundURL = URL(fileURLWithPath: pathToSoundFile!)
-        AudioServicesCreateSystemSoundID(soundURL as CFURL, &gameSound)
-    }
-    
-    func playGameStartSound() {
-        AudioServicesPlaySystemSound(gameSound)
-    }
+
 }
 
