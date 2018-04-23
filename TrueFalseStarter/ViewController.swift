@@ -142,6 +142,7 @@ class ViewController: UIViewController {
     //answer button touch up inside event
     @IBAction func checkAnswer(_ sender: UIButton) {
         
+        //only allow a question to be answered once
         if game.questionsAnswered < game.questionsAsked {
             
             //show results
@@ -234,7 +235,6 @@ class ViewController: UIViewController {
         // Calculates a time value to execute the method given current time and delay
         let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
         
-        // Executes the nextRound method at the dispatch time on the main queue
         DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
             
             // Hide the answer buttons
