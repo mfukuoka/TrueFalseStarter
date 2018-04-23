@@ -16,6 +16,8 @@ class Game {
     var quiz = Quiz()
     var correctAnswers = 0
     var totalQuestions = 0
+    var questionsAsked = 0
+    var questionsAnswered = 0
     init(){
         
         totalQuestions = quiz.questions.count
@@ -26,11 +28,15 @@ class Game {
         quiz = Quiz()
         correctAnswers = 0
         totalQuestions = quiz.questions.count
+        questionsAsked = 0
+        questionsAnswered = 0
     }
     
     ///remove a random question from the quiz
     func pickRandomQuestion() -> Question? {
+        questionsAsked += 1 
         if quiz.questions.count > 0 {
+        
         return quiz.questions.remove(at: GKRandomSource.sharedRandom().nextInt(upperBound: quiz.questions.count))
         }
         else{
@@ -40,6 +46,7 @@ class Game {
     //function to get the current questions correct answer
     func isAnswerCorrect(question: Question?, answer: Int) -> (isCorrect: Bool,answer: Int){
         if let correctAnswer = question?.correctAnswer {
+            questionsAnswered += 1
             if correctAnswer == answer {
                 self.correctAnswers += 1
                 self.playCorrectAnswerSound()
