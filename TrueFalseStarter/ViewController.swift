@@ -21,8 +21,8 @@ class ViewController: UIViewController {
     @IBOutlet weak var playAgainButton: UIButton!
     
     let game = Game()
-    var currentQuestion: Question?
-    var gameTimer: DispatchWorkItem?
+
+    //var gameTimer: DispatchWorkItem?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,8 +30,7 @@ class ViewController: UIViewController {
         // Start game
         game.playGameStartSound()
         answerLabel.isHidden = true
-        currentQuestion = game.pickRandomQuestion()
-        displayQuestion(question: currentQuestion!) 
+        displayQuestion(question: game.currentQuestion!)
     }
 
     override func didReceiveMemoryWarning() {
@@ -72,6 +71,7 @@ class ViewController: UIViewController {
         self.option4Button.isHidden = true
         playAgainButton.isHidden = false
     }
+    
     //highlight the answer and show the next question button
     func setScreenFor(answer: Int){
         
@@ -128,7 +128,7 @@ class ViewController: UIViewController {
     func displayQuestion(question: Question) {
         
         //update screen
-        currentQuestion = question
+        game.currentQuestion = question
         questionField.text = question.question
         option1Button.setTitle(question.option1, for: .normal)
         option2Button.setTitle(question.option2, for: .normal)
@@ -136,7 +136,7 @@ class ViewController: UIViewController {
         option4Button.setTitle(question.option4, for: .normal)
         playAgainButton.isHidden = true
 
-        gameTimer = self.lightingMode()
+        game.gameTimer = self.lightingMode()
     }
     
     //answer button touch up inside event
@@ -164,7 +164,7 @@ class ViewController: UIViewController {
             }
             
             //is answer correct?
-            let correctAnswer = game.isAnswerCorrect(question: currentQuestion, answer: selectedAnswer)
+            let correctAnswer = game.isAnswerCorrect(question: game.currentQuestion, answer: selectedAnswer)
             if correctAnswer.isCorrect {
                 answerLabel.text = "Correct!"
                 answerLabel.textColor = UIColor.init(red: 0, green: 204/255.0, blue: 0, alpha: 1)
@@ -179,7 +179,7 @@ class ViewController: UIViewController {
             setScreenFor(answer: correctAnswer.answer)
             
             //cancel lighting mode since something was picked
-            if let timer = gameTimer  {
+            if let timer = game.gameTimer  {
                 timer.cancel()
             }
             
@@ -192,20 +192,19 @@ class ViewController: UIViewController {
             }
         }
     }
-    
-    //start the next round
-    func nextRound() {
-        if let nextQuestion = self.game.pickRandomQuestion() {
-            self.displayQuestion(question: nextQuestion)
-        }
-    }
-    
     //acts as a next button and a play again button
     @IBAction func playAgain() {
         
-        //if there are no more questions then lets restart the game
-        if game.quiz.questions.count < 1 {
-            
+        //if there are still questions then get the next question.
+        //otherwise show the score and a play again button
+        if game.quiz.questions.count > 0  {
+            //show next question
+            self.setScreenToDefault()
+            if let nextQuestion = self.game.pickRandomQuestion() {
+                self.displayQuestion(question: nextQuestion)
+            }
+        }
+        else {
             // Show the answer buttons
             option1Button.isHidden = false
             option2Button.isHidden = false
@@ -215,13 +214,8 @@ class ViewController: UIViewController {
             //restart game
             game.restartGame()
             setScreenToDefault()
-            currentQuestion = game.pickRandomQuestion()
-            displayQuestion(question: currentQuestion!)
-        }
-        else {
-            //show next question
-            self.setScreenToDefault()
-            self.nextRound()
+            game.currentQuestion = game.pickRandomQuestion()
+            displayQuestion(question: game.currentQuestion!)
         }
         
     }

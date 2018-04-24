@@ -18,10 +18,19 @@ class Game {
     var totalQuestions = 0
     var questionsAsked = 0
     var questionsAnswered = 0
+    var currentQuestion: Question?
+    var gameTimer: DispatchWorkItem?
     init(){
         
         totalQuestions = quiz.questions.count
+        currentQuestion = self.pickRandomQuestion()
     }
+    
+    ///
+    func startRound(){
+        currentQuestion = self.pickRandomQuestion()
+    }
+    
     ///starts the game over
     func restartGame(){
         self.playGameStartSound()
