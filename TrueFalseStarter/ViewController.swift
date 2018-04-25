@@ -14,23 +14,23 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var questionField: UILabel!
     @IBOutlet weak var answerLabel: UILabel!
-    @IBOutlet weak var option1Button: UIButton!
-    @IBOutlet weak var option2Button: UIButton!
-    @IBOutlet weak var option3Button: UIButton!
-    @IBOutlet weak var option4Button: UIButton!
-    @IBOutlet weak var playAgainButton: UIButton!
+    @IBOutlet weak var answer1Button: UIButton!
+    @IBOutlet weak var answer2Button: UIButton!
+    @IBOutlet weak var answer3Button: UIButton!
+    @IBOutlet weak var answer4Button: UIButton!
+    @IBOutlet weak var nextButton: UIButton!
     
     let game = Game()
-
-    //var gameTimer: DispatchWorkItem?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Start game
+        // Let the games begin!
         game.playGameStartSound()
-        answerLabel.isHidden = true
-        displayQuestion(question: game.currentQuestion!)
+        
+        // show the first question
+        self.displayQuestion()
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -40,23 +40,14 @@ class ViewController: UIViewController {
     
     //resets all the answer buttons to their default state
     func setScreenToDefault(){
-        let defaultColor = UIColor.init(red: 12/255.0, green: 121/255.0, blue: 150/255.0, alpha: 1)
-        option1Button.backgroundColor = defaultColor
-        option2Button.backgroundColor = defaultColor
-        option3Button.backgroundColor = defaultColor
-        option4Button.backgroundColor = defaultColor
-        option1Button.setTitleColor(UIColor.white, for: .normal)
-        option2Button.setTitleColor(UIColor.white, for: .normal)
-        option3Button.setTitleColor(UIColor.white, for: .normal)
-        option4Button.setTitleColor(UIColor.white, for: .normal)
-        self.option1Button.isHidden = false
-        self.option2Button.isHidden = false
-        self.option3Button.isHidden = false
-        self.option4Button.isHidden = false
+        game.defaultStyleFor(button: answer1Button)
+        game.defaultStyleFor(button: answer2Button)
+        game.defaultStyleFor(button: answer3Button)
+        game.defaultStyleFor(button: answer4Button)
         self.answerLabel.isHidden = true
         self.questionField.isHidden = false
-        playAgainButton.isHidden = true
-        playAgainButton.setTitle("Next Question", for: .normal)
+        nextButton.isHidden = true
+        nextButton.setTitle("Next Question", for: .normal)
     }
     
     //lighting mode.  You're out of time!
@@ -65,78 +56,59 @@ class ViewController: UIViewController {
         self.answerLabel.textColor = UIColor.init(red: 204/255.0, green: 0, blue: 0, alpha: 0.8)
         self.answerLabel.text = "You ran out of time!"
         self.questionField.isHidden = true
-        self.option1Button.isHidden = true
-        self.option2Button.isHidden = true
-        self.option3Button.isHidden = true
-        self.option4Button.isHidden = true
-        playAgainButton.isHidden = false
+        self.answer1Button.isHidden = true
+        self.answer2Button.isHidden = true
+        self.answer3Button.isHidden = true
+        self.answer4Button.isHidden = true
+        nextButton.isHidden = false
     }
     
     //highlight the answer and show the next question button
     func setScreenFor(answer: Int){
         
-        //highlight answer button of correct answer
-        let correctAnswerColor = UIColor.init(red: 51/255.0, green: 204/255.0, blue: 102/255.0, alpha: 1)
-        let otherAnswerColor = UIColor.init(red: 0/255.0, green: 231/255.0, blue: 254/255.0, alpha: 0.2)
-        let otherAnswerTextColor = UIColor.init(red: 204/255.0, green: 204/255.0, blue: 204/255.0, alpha: 0.25)
-        
         switch answer {
         case 1:
-            option1Button.setTitleColor(UIColor.black, for: .normal)
-            option1Button.backgroundColor = correctAnswerColor
-            option2Button.backgroundColor = otherAnswerColor
-            option2Button.setTitleColor(otherAnswerTextColor, for: .normal)
-            option3Button.backgroundColor = otherAnswerColor
-            option3Button.setTitleColor(otherAnswerTextColor, for: .normal)
-            option4Button.backgroundColor = otherAnswerColor
-            option4Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            game.correctAnswerStyleFor(button: answer1Button)
+            game.incorrectAnswerStyleFor(button: answer2Button)
+            game.incorrectAnswerStyleFor(button: answer3Button)
+            game.incorrectAnswerStyleFor(button: answer4Button)
         case 2:
-            option2Button.setTitleColor(UIColor.black, for: .normal)
-            option1Button.backgroundColor = otherAnswerColor
-            option1Button.setTitleColor(otherAnswerTextColor, for: .normal)
-            option2Button.backgroundColor = correctAnswerColor
-            option3Button.backgroundColor = otherAnswerColor
-            option3Button.setTitleColor(otherAnswerTextColor, for: .normal)
-            option4Button.backgroundColor = otherAnswerColor
-            option4Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            game.incorrectAnswerStyleFor(button: answer1Button)
+            game.correctAnswerStyleFor(button: answer2Button)
+            game.incorrectAnswerStyleFor(button: answer3Button)
+            game.incorrectAnswerStyleFor(button: answer4Button)
         case 3:
-            option3Button.setTitleColor(UIColor.black, for: .normal)
-            option1Button.backgroundColor = otherAnswerColor
-            option1Button.setTitleColor(otherAnswerTextColor, for: .normal)
-            option2Button.backgroundColor = otherAnswerColor
-            option2Button.setTitleColor(otherAnswerTextColor, for: .normal)
-            option3Button.backgroundColor = correctAnswerColor
-            option4Button.backgroundColor = otherAnswerColor
-            option4Button.setTitleColor(otherAnswerTextColor, for: .normal)
+            game.incorrectAnswerStyleFor(button: answer1Button)
+            game.incorrectAnswerStyleFor(button: answer2Button)
+            game.correctAnswerStyleFor(button: answer3Button)
+            game.incorrectAnswerStyleFor(button: answer4Button)
         case 4:
-            option4Button.setTitleColor(UIColor.black, for: .normal)
-            option1Button.backgroundColor = otherAnswerColor
-            option1Button.setTitleColor(otherAnswerTextColor, for: .normal)
-            option2Button.backgroundColor = otherAnswerColor
-            option2Button.setTitleColor(otherAnswerTextColor, for: .normal)
-            option3Button.backgroundColor = otherAnswerColor
-            option3Button.setTitleColor(otherAnswerTextColor, for: .normal)
-            option4Button.backgroundColor = correctAnswerColor
+            game.incorrectAnswerStyleFor(button: answer1Button)
+            game.incorrectAnswerStyleFor(button: answer2Button)
+            game.incorrectAnswerStyleFor(button: answer3Button)
+            game.correctAnswerStyleFor(button: answer4Button)
         default:
             self.setScreenToDefault()
         }
+        
         //show next button
-        playAgainButton.isHidden = false
+        nextButton.isHidden = false
     }
     
     //update the question label and the answer buttons
-    func displayQuestion(question: Question) {
+    func displayQuestion() {
         
         //update screen
-        game.currentQuestion = question
-        questionField.text = question.question
-        option1Button.setTitle(question.option1, for: .normal)
-        option2Button.setTitle(question.option2, for: .normal)
-        option3Button.setTitle(question.option3, for: .normal)
-        option4Button.setTitle(question.option4, for: .normal)
-        playAgainButton.isHidden = true
-
-        game.gameTimer = self.lightingMode()
+        game.startRound()
+        if let round = game.currentQuestion {
+            questionField.text = round.question
+            answer1Button.setTitle(round.answer1, for: .normal)
+            answer2Button.setTitle(round.answer2, for: .normal)
+            answer3Button.setTitle(round.answer3, for: .normal)
+            answer4Button.setTitle(round.answer4, for: .normal)
+            nextButton.isHidden = true
+            game.gameTimer = self.lightingMode()
+        }
     }
     
     //answer button touch up inside event
@@ -151,13 +123,13 @@ class ViewController: UIViewController {
             //get the selected answer from the sender
             var selectedAnswer = 0
             switch sender {
-            case option1Button:
+            case answer1Button:
                 selectedAnswer = 1
-            case option2Button:
+            case answer2Button:
                 selectedAnswer = 2
-            case option3Button:
+            case answer3Button:
                 selectedAnswer = 3
-            case option4Button:
+            case answer4Button:
                 selectedAnswer = 4
             default: selectedAnswer = 0
                 
@@ -184,11 +156,10 @@ class ViewController: UIViewController {
             }
             
             //if its the last question then show the score and a play it again button after 2 seconds
-            if game.questionsAnswered == game.totalQuestions {
-                    playAgainButton.setTitle("Play Again", for: .normal)
-                    playAgainButton.isHidden = true
+            if game.isOver {
+                    nextButton.setTitle("Play Again", for: .normal)
+                    nextButton.isHidden = true
                     displayScoreAfterDelay(seconds: 2)
-                
             }
         }
     }
@@ -199,23 +170,20 @@ class ViewController: UIViewController {
         //otherwise show the score and a play again button
         if game.quiz.questions.count > 0  {
             //show next question
-            self.setScreenToDefault()
-            if let nextQuestion = self.game.pickRandomQuestion() {
-                self.displayQuestion(question: nextQuestion)
-            }
+            setScreenToDefault()
+            displayQuestion()
         }
         else {
             // Show the answer buttons
-            option1Button.isHidden = false
-            option2Button.isHidden = false
-            option3Button.isHidden = false
-            option4Button.isHidden = false
+            answer1Button.isHidden = false
+            answer2Button.isHidden = false
+            answer3Button.isHidden = false
+            answer4Button.isHidden = false
             
             //restart game
             game.restartGame()
             setScreenToDefault()
-            game.currentQuestion = game.pickRandomQuestion()
-            displayQuestion(question: game.currentQuestion!)
+            displayQuestion()
         }
         
     }
@@ -232,17 +200,17 @@ class ViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: dispatchTime) {
             
             // Hide the answer buttons
-            self.option1Button.isHidden = true
-            self.option2Button.isHidden = true
-            self.option3Button.isHidden = true
-            self.option4Button.isHidden = true
+            self.answer1Button.isHidden = true
+            self.answer2Button.isHidden = true
+            self.answer3Button.isHidden = true
+            self.answer4Button.isHidden = true
             self.answerLabel.isHidden = true
             
             // Display play again button
-            self.playAgainButton.setTitle("Play Again", for: .normal)
-            self.playAgainButton.isHidden = false
+            self.nextButton.setTitle("Play Again", for: .normal)
+            self.nextButton.isHidden = false
             self.game.playGameEndSound()
-            self.questionField.text = "Way to go!\nYou got \(self.game.correctAnswers) out of \(self.game.totalQuestions) correct!"
+            self.questionField.text = "Way to go!\nYou got \(self.game.correctAnswers) out of \(self.game.questionsAsked) correct!"
             self.questionField.isHidden = false
         }
     }
@@ -265,8 +233,8 @@ class ViewController: UIViewController {
             
             //if its the last question then show the score and a play again button after 2 seconds
             if self.game.questionsAsked == self.game.totalQuestions {
-                self.playAgainButton.setTitle("Play Again", for: .normal)
-                self.playAgainButton.isHidden = true
+                self.nextButton.setTitle("Play Again", for: .normal)
+                self.nextButton.isHidden = true
                 self.displayScoreAfterDelay(seconds: 2)
             }
         })
