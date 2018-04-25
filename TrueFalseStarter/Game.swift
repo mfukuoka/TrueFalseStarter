@@ -30,6 +30,17 @@ class Game {
         totalQuestions = quiz.questions.count
     }
     
+    func scoreMessage() -> String {
+        let correct = Double(correctAnswers)
+        let questions = Double(questionsAsked)
+        
+        if (correct / questions) > 0.5 {
+            return "Way to go!\nYou got \(correctAnswers) out of \(questionsAsked) correct.\nA total of \( (correct / questions) * 100)%!"
+        }
+        else{
+            return "Better luck next time! \nYou got \(correctAnswers) out of \(questionsAsked) correct!\nA total of \( (correct / questions) * 100)%"
+        }
+    }
     ///makes the button visible and changes background color and title color to default
     func defaultStyleFor(button: UIButton){
             button.backgroundColor = self.defaultButtonColor
@@ -61,6 +72,7 @@ class Game {
         totalQuestions = quiz.questions.count
         questionsAsked = 0
         questionsAnswered = 0
+        isOver = false
     }
     
     ///remove a random question from the quiz
@@ -80,7 +92,7 @@ class Game {
             questionsAnswered += 1
             if questionsAnswered == numberOfRounds ||
                 questionsAsked == totalQuestions {
-                isOver=true
+                isOver = true
             }
             if correctAnswer == answer {
                 self.correctAnswers += 1

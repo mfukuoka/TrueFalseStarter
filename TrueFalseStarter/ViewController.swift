@@ -25,17 +25,36 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Let the games begin!
+        // Let the games.. begin!
         game.playGameStartSound()
         
         // show the first question
         self.displayQuestion()
-        
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    //update the question label and the answer buttons
+    func displayQuestion() {
+        
+        //update screen
+        game.startRound()
+        if let round = game.currentQuestion {
+            questionField.text = round.question
+            answer1Button.setTitle(round.answer1, for: .normal)
+            answer2Button.setTitle(round.answer2, for: .normal)
+            answer3Button.setTitle(round.answer3, for: .normal)
+            answer4Button.setTitle(round.answer4, for: .normal)
+            answer4Button.isHidden = true
+            nextButton.isHidden = true
+            game.gameTimer = self.lightingMode()
+        }
+        else {
+            questionField.text = "Error."
+        }
     }
     
     //resets all the answer buttons to their default state
@@ -90,26 +109,11 @@ class ViewController: UIViewController {
         default:
             self.setScreenToDefault()
         }
-        
-        //show next button
+        //show the next button
         nextButton.isHidden = false
     }
     
-    //update the question label and the answer buttons
-    func displayQuestion() {
-        
-        //update screen
-        game.startRound()
-        if let round = game.currentQuestion {
-            questionField.text = round.question
-            answer1Button.setTitle(round.answer1, for: .normal)
-            answer2Button.setTitle(round.answer2, for: .normal)
-            answer3Button.setTitle(round.answer3, for: .normal)
-            answer4Button.setTitle(round.answer4, for: .normal)
-            nextButton.isHidden = true
-            game.gameTimer = self.lightingMode()
-        }
-    }
+
     
     //answer button touch up inside event
     @IBAction func checkAnswer(_ sender: UIButton) {
@@ -168,7 +172,7 @@ class ViewController: UIViewController {
         
         //if there are still questions then get the next question.
         //otherwise show the score and a play again button
-        if game.quiz.questions.count > 0  {
+        if !game.isOver  {
             //show next question
             setScreenToDefault()
             displayQuestion()
@@ -210,7 +214,7 @@ class ViewController: UIViewController {
             self.nextButton.setTitle("Play Again", for: .normal)
             self.nextButton.isHidden = false
             self.game.playGameEndSound()
-            self.questionField.text = "Way to go!\nYou got \(self.game.correctAnswers) out of \(self.game.questionsAsked) correct!"
+            self.questionField.text = self.game.scoreMessage()
             self.questionField.isHidden = false
         }
     }
@@ -232,7 +236,7 @@ class ViewController: UIViewController {
             self.game.questionsAnswered += 1
             
             //if its the last question then show the score and a play again button after 2 seconds
-            if self.game.questionsAsked == self.game.totalQuestions {
+            if self.game.isOver {
                 self.nextButton.setTitle("Play Again", for: .normal)
                 self.nextButton.isHidden = true
                 self.displayScoreAfterDelay(seconds: 2)
