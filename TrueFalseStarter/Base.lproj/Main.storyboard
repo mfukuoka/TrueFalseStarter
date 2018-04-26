@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -30,6 +31,9 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J1V-MS-ECi">
                                 <rect key="frame" x="36" y="247" width="248" height="32"/>
                                 <color key="backgroundColor" red="0.047058823529411764" green="0.47450980392156861" blue="0.58823529411764708" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="J1V-MS-ECi" secondAttribute="height" multiplier="31:4" id="bdx-P2-xCe"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Answer 2"/>
@@ -45,6 +49,9 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hPV-dp-DQI">
                                 <rect key="frame" x="36" y="190" width="248" height="32"/>
                                 <color key="backgroundColor" red="0.047058823530000002" green="0.47450980390000003" blue="0.58823529409999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="hPV-dp-DQI" secondAttribute="height" multiplier="31:4" id="LU5-dr-0uY"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Answer 1"/>
@@ -60,6 +67,9 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AS4-HX-g9f">
                                 <rect key="frame" x="36" y="304" width="248" height="32"/>
                                 <color key="backgroundColor" red="0.047058823530000002" green="0.47450980390000003" blue="0.58823529409999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="AS4-HX-g9f" secondAttribute="height" multiplier="31:4" id="1fQ-8N-FlT"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Answer 3"/>
@@ -81,6 +91,9 @@
                             <button opaque="NO" contentMode="scaleToFill" layoutMarginsFollowReadableWidth="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qnc-fo-Pv0">
                                 <rect key="frame" x="36" y="361" width="248" height="32"/>
                                 <color key="backgroundColor" red="0.047058823529411764" green="0.47450980392156861" blue="0.58823529411764708" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="qnc-fo-Pv0" secondAttribute="height" multiplier="31:4" id="mBN-6a-rvH"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="16"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Answer 4"/>
@@ -102,6 +115,9 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K17-uy-MvB">
                                 <rect key="frame" x="36" y="418" width="248" height="32"/>
                                 <color key="backgroundColor" red="0.0" green="0.57647058823529407" blue="0.52941176470588236" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="K17-uy-MvB" secondAttribute="height" multiplier="31:4" id="1uQ-44-ypx"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Next Question"/>
@@ -142,8 +158,14 @@
                     </view>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="lightContent"/>
                     <connections>
+                        <outlet property="answer1AspectRatio" destination="LU5-dr-0uY" id="cyi-m9-t6U"/>
+                        <outlet property="answer1Bottom" destination="2Vl-eb-ZaO" id="bEy-PN-i9L"/>
                         <outlet property="answer1Button" destination="hPV-dp-DQI" id="YZr-YU-aO1"/>
+                        <outlet property="answer2AspectRatio" destination="bdx-P2-xCe" id="CYy-Hg-oEL"/>
+                        <outlet property="answer2Bottom" destination="5PM-a1-thV" id="7aP-ML-QOU"/>
                         <outlet property="answer2Button" destination="J1V-MS-ECi" id="rvH-WU-0k9"/>
+                        <outlet property="answer3AspectRatio" destination="1fQ-8N-FlT" id="xna-g3-kFG"/>
+                        <outlet property="answer3Bottom" destination="ZP7-Vu-0oc" id="Gco-d7-7Ni"/>
                         <outlet property="answer3Button" destination="AS4-HX-g9f" id="Ni4-VM-Mcn"/>
                         <outlet property="answer4Button" destination="qnc-fo-Pv0" id="85E-3g-WOW"/>
                         <outlet property="answerLabel" destination="pjU-0Y-cGW" id="BU9-S7-MbT"/>

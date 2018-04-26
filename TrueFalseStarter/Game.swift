@@ -59,10 +59,7 @@ class Game {
         button.setTitleColor(incorrectTextColor, for: .normal)
     }
     
-    ///changes the current question to a random one from the list
-    func startRound(){
-        currentQuestion = self.pickRandomQuestion()
-    }
+
     
     ///starts the game over
     func restartGame(){
@@ -132,5 +129,6 @@ class Game {
     func playGameEndSound(){
     AudioServicesPlaySystemSound(1027)
     }
+    
 }
 

@@ -19,8 +19,20 @@ class ViewController: UIViewController {
     @IBOutlet weak var answer3Button: UIButton!
     @IBOutlet weak var answer4Button: UIButton!
     @IBOutlet weak var nextButton: UIButton!
+    @IBOutlet weak var answer1Bottom: NSLayoutConstraint!
+    @IBOutlet weak var answer2Bottom: NSLayoutConstraint!
+    @IBOutlet weak var answer3Bottom: NSLayoutConstraint!
+    @IBOutlet var answer1AspectRatio: NSLayoutConstraint!
+    @IBOutlet var answer2AspectRatio: NSLayoutConstraint!
+    @IBOutlet var answer3AspectRatio: NSLayoutConstraint!
     
     let game = Game()
+    var answer1BottomDefault: CGFloat = 0.0
+    var answer2BottomDefault: CGFloat = 0.0
+    var answer3BottomDefault: CGFloat = 0.0
+    var answer1HeightConstraint: NSLayoutConstraint?
+    var answer2HeightConstraint: NSLayoutConstraint?
+    var answer3HeightConstraint: NSLayoutConstraint?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,8 +40,16 @@ class ViewController: UIViewController {
         // Let the games.. begin!
         game.playGameStartSound()
         
+        //constraint defaults for 3 answer questions
+        answer1BottomDefault = answer1Bottom.constant
+        answer2BottomDefault = answer2Bottom.constant
+        answer3BottomDefault = answer3Bottom.constant
+        answer1HeightConstraint = answer1Button.heightAnchor.constraint(equalToConstant: 75)
+        answer2HeightConstraint = answer2Button.heightAnchor.constraint(equalToConstant: 75)
+        answer3HeightConstraint = answer3Button.heightAnchor.constraint(equalToConstant: 75)
+        
         // show the first question
-        self.displayQuestion()
+        startRound()
     }
 
     override func didReceiveMemoryWarning() {
@@ -37,36 +57,46 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    //update the question label and the answer buttons
-    func displayQuestion() {
-        
-        //update screen
-        game.startRound()
-        if let round = game.currentQuestion {
-            questionField.text = round.question
-            answer1Button.setTitle(round.answer1, for: .normal)
-            answer2Button.setTitle(round.answer2, for: .normal)
-            answer3Button.setTitle(round.answer3, for: .normal)
-            answer4Button.setTitle(round.answer4, for: .normal)
-            answer4Button.isHidden = true
-            nextButton.isHidden = true
-            game.gameTimer = self.lightingMode()
-        }
-        else {
-            questionField.text = "Error."
-        }
+    //don't allow to rotate the screen
+    override open var shouldAutorotate: Bool {
+        return false
     }
-    
+
     //resets all the answer buttons to their default state
     func setScreenToDefault(){
         game.defaultStyleFor(button: answer1Button)
         game.defaultStyleFor(button: answer2Button)
         game.defaultStyleFor(button: answer3Button)
         game.defaultStyleFor(button: answer4Button)
+        answer1Bottom.constant = answer1BottomDefault
+        answer2Bottom.constant = answer2BottomDefault
+        answer3Bottom.constant = answer3BottomDefault 
         self.answerLabel.isHidden = true
         self.questionField.isHidden = false
         nextButton.isHidden = true
         nextButton.setTitle("Next Question", for: .normal)
+        setConstraintsToDefault()
+        
+
+    }
+    
+    //sets all auto layout constraints back to their default
+    func setConstraintsToDefault(){
+        answer1Bottom.constant = answer1BottomDefault
+        answer2Bottom.constant = answer2BottomDefault
+        answer3Bottom.constant = answer3BottomDefault
+        if let answer = answer1HeightConstraint {
+            answer.isActive = false
+        }
+        if let answer = answer2HeightConstraint {
+            answer.isActive = false
+        }
+        if let answer = answer3HeightConstraint {
+            answer.isActive = false
+        }
+        answer1AspectRatio.isActive = true
+        answer2AspectRatio.isActive = true
+        answer3AspectRatio.isActive = true
     }
     
     //lighting mode.  You're out of time!
@@ -81,6 +111,7 @@ class ViewController: UIViewController {
         self.answer4Button.isHidden = true
         nextButton.isHidden = false
     }
+    
     
     //highlight the answer and show the next question button
     func setScreenFor(answer: Int){
@@ -112,7 +143,47 @@ class ViewController: UIViewController {
         //show the next button
         nextButton.isHidden = false
     }
-    
+    func setScreenToThreeQuesitons(){
+        answer4Button.isHidden = true
+        answer1Bottom.constant = 30
+        answer2Bottom.constant = 30
+        answer3Bottom.constant = -10
+        answer1AspectRatio.isActive = false
+        answer2AspectRatio.isActive = false
+        answer3AspectRatio.isActive = false
+        if let answer = answer1HeightConstraint {
+            answer.isActive = true
+        }
+        if let answer = answer2HeightConstraint {
+            answer.isActive = true
+        }
+        if let answer = answer3HeightConstraint {
+            answer.isActive = true
+        }
+    }
+    ///changes the current question to a random one from the list
+    func startRound(){
+        game.currentQuestion = game.pickRandomQuestion()
+        if let round = game.currentQuestion {
+            questionField.text = round.question
+            answer1Button.setTitle(round.answer1, for: .normal)
+            answer2Button.setTitle(round.answer2, for: .normal)
+            answer3Button.setTitle(round.answer3, for: .normal)
+            //if there isn't a fourth answer resize ui
+            if round.answer4 == "" {
+                setScreenToThreeQuesitons()
+            
+            }
+            else{
+                answer4Button.setTitle(round.answer4, for: .normal)
+            }
+            nextButton.isHidden = true
+            game.gameTimer = self.lightingMode()
+        }
+        else {
+            print("Error: no questions loaded.")
+        }
+    }
 
     
     //answer button touch up inside event
@@ -175,7 +246,8 @@ class ViewController: UIViewController {
         if !game.isOver  {
             //show next question
             setScreenToDefault()
-            displayQuestion()
+            startRound()
+
         }
         else {
             // Show the answer buttons
@@ -187,7 +259,7 @@ class ViewController: UIViewController {
             //restart game
             game.restartGame()
             setScreenToDefault()
-            displayQuestion()
+            startRound()
         }
         
     }
