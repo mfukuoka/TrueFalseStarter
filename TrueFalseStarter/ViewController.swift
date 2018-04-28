@@ -33,6 +33,8 @@ class ViewController: UIViewController {
     var answer1HeightConstraint: NSLayoutConstraint?
     var answer2HeightConstraint: NSLayoutConstraint?
     var answer3HeightConstraint: NSLayoutConstraint?
+    var countdownTimer: Timer!
+    var countdownLabelText = 16
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,6 +66,7 @@ class ViewController: UIViewController {
 
     //resets all the answer buttons to their default state
     func setScreenToDefault(){
+        countdownTimer.invalidate()
         game.defaultStyleFor(button: answer1Button)
         game.defaultStyleFor(button: answer2Button)
         game.defaultStyleFor(button: answer3Button)
@@ -179,12 +182,32 @@ class ViewController: UIViewController {
             }
             nextButton.isHidden = true
             game.gameTimer = self.lightingMode()
+            countdownTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateLabel), userInfo: nil, repeats: true)
         }
         else {
             print("Error: no questions loaded.")
         }
     }
 
+    //updates the answer label to countdown from 15
+    func updateLabel(){
+        
+        if countdownLabelText <= 0 ||
+            countdownLabelText > 15 {
+            countdownLabelText = 16
+            self.answerLabel.textColor = UIColor.init(red: 0, green: 204/255.0, blue: 0, alpha: 0.8)
+        }
+        if countdownLabelText == 10 {
+            self.answerLabel.textColor = UIColor.init(red: 225/255.0, green: 25/255.0, blue: 25/255.0, alpha: 0.8)
+        }
+        if countdownLabelText == 5 {
+            self.answerLabel.textColor = UIColor.init(red: 204/255.0, green: 0, blue: 0, alpha: 0.8)
+        }
+        countdownLabelText -= 1
+        answerLabel.text = "\(countdownLabelText)"
+        answerLabel.isHidden = false
+        
+    }
     
     //answer button touch up inside event
     @IBAction func checkAnswer(_ sender: UIButton) {
@@ -228,6 +251,8 @@ class ViewController: UIViewController {
             //cancel lighting mode since something was picked
             if let timer = game.gameTimer  {
                 timer.cancel()
+                countdownTimer.invalidate()
+                countdownLabelText = 16
             }
             
             //if its the last question then show the score and a play it again button after 2 seconds
@@ -302,6 +327,8 @@ class ViewController: UIViewController {
         let dispatchTime = DispatchTime.now() + Double(delay) / Double(NSEC_PER_SEC)
         let lighting = DispatchWorkItem(block: {
             
+            self.countdownTimer.invalidate()
+            self.countdownLabelText = 16
             //set the screen for ran out of time message, play wrong answer sound
             self.setScreenOutOfTime()
             self.game.playWrongAnswerSound()

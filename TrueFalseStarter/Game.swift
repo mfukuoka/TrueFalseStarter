@@ -26,6 +26,7 @@ class Game {
     let correctAnswerColor = UIColor.init(red: 51/255.0, green: 204/255.0, blue: 102/255.0, alpha: 1)
     let incorrectAnswerColor = UIColor.init(red: 0/255.0, green: 231/255.0, blue: 254/255.0, alpha: 0.2)
     let incorrectTextColor = UIColor.init(red: 204/255.0, green: 204/255.0, blue: 204/255.0, alpha: 0.25)
+
     init(){
         totalQuestions = quiz.questions.count
     }
